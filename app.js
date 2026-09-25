@@ -1,5 +1,5 @@
 // 2020 Companies · Merch Scheduler Demo (National USA)
-// Auto-assign closest + TSP routes + tracking hooks
+// Auto-assign closest + TSP routes + tracking + brand bulk hooks
 
 const AVG_SPEED_MPH = 40;
 const EARTH_RADIUS_MI = 3958.8;
@@ -126,11 +126,11 @@ function drawRoutes(store, people) {
 }
 function renderStoreList(filter = "") {
   const list = $("storeList"); if (!list) return;
-  const q = filter.toLowerCase();
-  const filtered = state.stores.filter((s) =>
-    s.fullName.toLowerCase().includes(q) || s.city.toLowerCase().includes(q) || s.chain.toLowerCase().includes(q) ||
-    s.projectCode.toLowerCase().includes(q) || s.brand.toLowerCase().includes(q) || (s.market && s.market.toLowerCase().includes(q))
-  );
+  const q = filter.toLowerCase().trim();
+  const filtered = state.stores.filter((s) => {
+    const hay = [s.fullName, s.city, s.chain, s.projectCode, s.brand, s.market || "", s.name || "", s.address || ""].join(" ").toLowerCase();
+    return !q || hay.includes(q);
+  });
   const shown = filtered.slice(0, 80);
   list.innerHTML = shown.map((s) => {
     const assigned = state.assignments.some((a) => a.storeId === s.id);
@@ -216,6 +216,7 @@ function confirmAssignment() {
   $("assignmentPanel").style.display = "none"; $("resultsPanel").style.display = "none";
   clearRoutes(); updateStats(); renderStoreList($("storeSearch").value);
   renderAssignedList(); if (typeof renderTrackingList === "function") renderTrackingList();
+  if (typeof populateBulkBrandSelect === "function") populateBulkBrandSelect();
   renderMarkers(); refreshMerchIfNeeded();
 }
 function autoAssignAllVisible() {
@@ -236,6 +237,7 @@ function autoAssignAllVisible() {
   });
   updateStats(); renderStoreList($("storeSearch").value); renderAssignedList();
   if (typeof renderTrackingList === "function") renderTrackingList();
+  if (typeof populateBulkBrandSelect === "function") populateBulkBrandSelect();
   renderMarkers(); refreshMerchIfNeeded();
   alert(`Auto-assigned closest person to ${assigned} stores (max 25 per run).`);
 }
@@ -261,6 +263,7 @@ function resetAll() {
   $("assignmentPanel").style.display = "none"; $("resultsPanel").style.display = "none";
   clearRoutes(); updateStats(); renderStoreList(); renderAssignedList();
   if (typeof renderTrackingList === "function") renderTrackingList();
+  if (typeof populateBulkBrandSelect === "function") populateBulkBrandSelect();
   renderMarkers(); refreshMerchIfNeeded();
 }
 function switchView(view) {
@@ -349,10 +352,11 @@ function refreshMerchIfNeeded() { if (state.currentView === "merch") { renderWee
 document.addEventListener("DOMContentLoaded", () => {
   initSupervisorMap(); renderStoreList(); renderAssignedList(); updateStats();
   if (typeof renderTrackingList === "function") renderTrackingList();
+  if (typeof populateBulkBrandSelect === "function") populateBulkBrandSelect();
   const sidebar = document.querySelector(".sidebar");
   if (sidebar && !$("autoAllBtn")) {
     const wrap = document.createElement("section"); wrap.className = "panel";
-    wrap.innerHTML = '<h2>Bulk Auto-Assign</h2><p class="hint">Closest available person for up to 25 open stores.</p>';
+    wrap.innerHTML = '<h2>Bulk Auto-Assign (any brand)</h2><p class="hint">Closest available person for up to 25 open stores.</p>';
     const btn = document.createElement("button"); btn.id = "autoAllBtn"; btn.className = "btn secondary full"; btn.textContent = "Auto-assign closest to many stores";
     btn.addEventListener("click", autoAssignAllVisible); wrap.appendChild(btn); sidebar.appendChild(wrap);
   }
@@ -361,6 +365,9 @@ document.addEventListener("DOMContentLoaded", () => {
   $("assignBtn").addEventListener("click", confirmAssignment);
   $("resetBtn").addEventListener("click", resetAll);
   $("mapStyleBtn").addEventListener("click", toggleMapStyle);
+  if ($("brandBulkBtn") && typeof bulkAssignByBrand === "function") {
+    $("brandBulkBtn").addEventListener("click", bulkAssignByBrand);
+  }
   if ($("simTrackBtn") && typeof simulateAdvanceAll === "function") $("simTrackBtn").addEventListener("click", simulateAdvanceAll);
   document.querySelectorAll(".view-btn").forEach((btn) => btn.addEventListener("click", () => switchView(btn.dataset.view)));
   $("personPicker").addEventListener("change", (e) => selectPerson(e.target.value));
