@@ -105,11 +105,17 @@
           <h2>How It Works</h2>
           <ol class="howto">
             <li>Select any store nationwide</li>
-            <li>System auto-picks closest available (brand scope + drive)</li>
-            <li>Confirm or pick a fallback</li>
-            <li>My Schedule optimizes multi-stop routes (TSP)</li>
+            <li>Auto-picks closest (scope + drive)</li>
+            <li>Track: Scheduled → En Route → On Site → Completed</li>
+            <li>My Schedule optimizes multi-stop routes</li>
           </ol>
-          <p class="note">Nearest-neighbor routing for day plans. Production would use live traffic + Salesforce availability.</p>
+          <p class="note">Tracking is simulated in this demo. Production would use phone GPS + photo proof like package delivery apps.</p>
+        </section>
+        <section class="panel">
+          <h2>Live Tracking</h2>
+          <p class="hint">Job status like package delivery</p>
+          <div id="trackingList" class="list small"></div>
+          <button id="simTrackBtn" class="btn secondary full" style="margin-top:8px">Advance all statuses ▶</button>
         </section>
         <section class="panel">
           <h2>Assigned Today</h2>
