@@ -36,11 +36,30 @@
       <aside class="sidebar">
         <section class="panel">
           <h2>Select Assignment</h2>
-          <p class="hint">Tap a store — closest person auto-selected</p>
+          <p class="hint">Search by project name, brand, store, city</p>
           <div class="search-wrap">
-            <input type="text" id="storeSearch" placeholder="Search city, brand, store code..." autocomplete="off" />
+            <input type="text" id="storeSearch" placeholder="Search project, brand, store, city..." autocomplete="off" />
           </div>
           <div id="storeList" class="list"></div>
+        </section>
+
+        <section class="panel" id="brandBulkPanel">
+          <h2>Bulk by Brand (USA)</h2>
+          <p class="hint">Assign closest scoped people to all open projects for a brand</p>
+          <div class="form-row">
+            <label>Brand</label>
+            <select id="bulkBrand" class="person-picker" style="width:100%;min-width:0"></select>
+          </div>
+          <div class="form-row">
+            <label>Max stores this run</label>
+            <input type="number" id="bulkLimit" value="30" min="1" max="100" />
+          </div>
+          <div class="form-row">
+            <label>Max drive (min)</label>
+            <input type="number" id="bulkMaxDrive" value="120" min="15" max="300" />
+          </div>
+          <button id="brandBulkBtn" class="btn primary full">Bulk assign nearest by brand</button>
+          <div id="brandBulkResults" class="list small" style="margin-top:10px;max-height:220px"></div>
         </section>
 
         <section class="panel" id="assignmentPanel" style="display:none">
@@ -104,12 +123,12 @@
         <section class="panel">
           <h2>How It Works</h2>
           <ol class="howto">
-            <li>Select any store nationwide</li>
-            <li>Auto-picks closest (scope + drive)</li>
-            <li>Track: Scheduled → En Route → On Site → Completed</li>
-            <li>My Schedule optimizes multi-stop routes</li>
+            <li>Search by project name or brand</li>
+            <li>Or bulk-assign an entire brand USA-wide</li>
+            <li>Nearest + brand scope; fallbacks listed</li>
+            <li>Track jobs through delivery statuses</li>
           </ol>
-          <p class="note">Tracking is simulated in this demo. Production would use phone GPS + photo proof like package delivery apps.</p>
+          <p class="note">Bulk brand assign prioritizes people trained on that brand, then shortest drive.</p>
         </section>
         <section class="panel">
           <h2>Live Tracking</h2>
@@ -164,6 +183,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="data.js"></script>
   <script src="track.js"></script>
+  <script src="brand-bulk.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
