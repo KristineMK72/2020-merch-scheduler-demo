@@ -19,7 +19,7 @@
         <div class="logo">20</div>
         <div class="brand-text">
           <h1>Merch Scheduler</h1>
-          <p class="subtitle">Demo · MN / ND Market</p>
+          <p class="subtitle">Demo · Nationwide USA</p>
         </div>
       </div>
       <div class="topbar-actions">
@@ -36,9 +36,9 @@
       <aside class="sidebar">
         <section class="panel">
           <h2>Select Assignment</h2>
-          <p class="hint">Tap a store on the map or list</p>
+          <p class="hint">Tap a store — closest person auto-selected</p>
           <div class="search-wrap">
-            <input type="text" id="storeSearch" placeholder="Search stores, brands, codes..." autocomplete="off" />
+            <input type="text" id="storeSearch" placeholder="Search city, brand, store code..." autocomplete="off" />
           </div>
           <div id="storeList" class="list"></div>
         </section>
@@ -56,9 +56,9 @@
           </div>
           <div class="form-row">
             <label>Max Drive (min)</label>
-            <input type="number" id="maxDrive" value="75" min="15" max="180" />
+            <input type="number" id="maxDrive" value="120" min="15" max="300" />
           </div>
-          <button id="findPeopleBtn" class="btn primary full">Find Closest People</button>
+          <button id="findPeopleBtn" class="btn primary full">Refresh Closest People</button>
         </section>
 
         <section class="panel" id="resultsPanel" style="display:none">
@@ -104,12 +104,12 @@
         <section class="panel">
           <h2>How It Works</h2>
           <ol class="howto">
-            <li>Select a store</li>
-            <li>Set hours & people needed</li>
-            <li>Ranks by brand scope + drive time</li>
-            <li>Confirm to lock</li>
+            <li>Select any store nationwide</li>
+            <li>System auto-picks closest available (brand scope + drive)</li>
+            <li>Confirm or pick a fallback</li>
+            <li>My Schedule optimizes multi-stop routes (TSP)</li>
           </ol>
-          <p class="note">Drive times are approximate (distance × 40 mph). Production would use Salesforce availability/scopes + live routing.</p>
+          <p class="note">Nearest-neighbor routing for day plans. Production would use live traffic + Salesforce availability.</p>
         </section>
         <section class="panel">
           <h2>Assigned Today</h2>
@@ -145,7 +145,7 @@
             <span class="count-badge" id="dayCount">0</span>
           </div>
           <div id="merchAssignments" class="merch-list">
-            <div class="empty-state">Select a merchandiser to see their schedule</div>
+            <div class="empty-state">Select a merchandiser to see optimized route</div>
           </div>
         </div>
         <div class="merch-map-wrap">
