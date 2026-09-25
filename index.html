@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#f8fafc" />
   <title>2020 Companies · Merch Scheduler Demo</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,24 +17,28 @@
     <header class="topbar">
       <div class="brand">
         <div class="logo">20</div>
-        <div>
+        <div class="brand-text">
           <h1>Merch Scheduler</h1>
-          <p class="subtitle">Field Assignment Demo · MN · ND Market</p>
+          <p class="subtitle">Demo · MN / ND Market</p>
         </div>
       </div>
       <div class="topbar-actions">
-        <span class="badge">Demo Mode</span>
-        <button id="resetBtn" class="btn secondary">Reset Assignments</button>
+        <div class="view-toggle">
+          <button type="button" class="view-btn active" data-view="supervisor">Supervisor</button>
+          <button type="button" class="view-btn" data-view="merch">My Schedule</button>
+        </div>
+        <button id="mapStyleBtn" class="btn secondary small" title="Toggle map style">Streets</button>
+        <button id="resetBtn" class="btn secondary small">Reset</button>
       </div>
     </header>
 
-    <div class="main">
+    <div id="supervisorView" class="view main">
       <aside class="sidebar">
         <section class="panel">
           <h2>Select Assignment</h2>
-          <p class="hint">Click a store on the map or choose below</p>
+          <p class="hint">Tap a store on the map or list</p>
           <div class="search-wrap">
-            <input type="text" id="storeSearch" placeholder="Search stores, brands, codes..." />
+            <input type="text" id="storeSearch" placeholder="Search stores, brands, codes..." autocomplete="off" />
           </div>
           <div id="storeList" class="list"></div>
         </section>
@@ -40,25 +46,23 @@
         <section class="panel" id="assignmentPanel" style="display:none">
           <h2>Assignment Details</h2>
           <div id="selectedStoreInfo"></div>
-          
           <div class="form-row">
             <label>Project Time (hours)</label>
-            <input type="number" id="projectHours" value="2.5" min="0.5" step="0.5" />
+            <input type="number" id="projectHours" value="2" min="0.5" step="0.5" />
           </div>
           <div class="form-row">
             <label>People Needed</label>
-            <input type="number" id="peopleNeeded" value="2" min="1" max="8" />
+            <input type="number" id="peopleNeeded" value="1" min="1" max="6" />
           </div>
           <div class="form-row">
-            <label>Max Drive Time (min)</label>
-            <input type="number" id="maxDrive" value="75" min="15" max="120" />
+            <label>Max Drive (min)</label>
+            <input type="number" id="maxDrive" value="75" min="15" max="180" />
           </div>
-          
           <button id="findPeopleBtn" class="btn primary full">Find Closest People</button>
         </section>
 
         <section class="panel" id="resultsPanel" style="display:none">
-          <h2>Suggested Assignments</h2>
+          <h2>Suggested People</h2>
           <div id="assignmentSummary" class="summary"></div>
           <div id="peopleResults" class="list"></div>
           <button id="assignBtn" class="btn primary full">Confirm Assignment</button>
@@ -68,10 +72,10 @@
       <div class="map-wrap">
         <div id="map"></div>
         <div class="map-legend">
-          <div><span class="dot person"></span> Merchandiser Home</div>
-          <div><span class="dot store"></span> Retail Store</div>
+          <div><span class="dot person"></span> Merchandiser</div>
+          <div><span class="dot store"></span> Store</div>
           <div><span class="dot assigned"></span> Assigned</div>
-          <div><span class="dot selected"></span> Selected Store</div>
+          <div><span class="dot selected"></span> Selected</div>
         </div>
       </div>
 
@@ -81,44 +85,77 @@
           <div class="stat-grid">
             <div class="stat">
               <div class="stat-value" id="statPeople">0</div>
-              <div class="stat-label">Field Merchandisers</div>
+              <div class="stat-label">Merchandisers</div>
             </div>
             <div class="stat">
               <div class="stat-value" id="statStores">0</div>
-              <div class="stat-label">Active Stores</div>
+              <div class="stat-label">Stores</div>
             </div>
             <div class="stat">
               <div class="stat-value" id="statAssigned">0</div>
-              <div class="stat-label">Assigned Today</div>
+              <div class="stat-label">Assigned</div>
             </div>
             <div class="stat">
               <div class="stat-value" id="statDrive">—</div>
-              <div class="stat-label">Avg Drive (min)</div>
+              <div class="stat-label">Avg Drive</div>
             </div>
           </div>
         </section>
-
         <section class="panel">
-          <h2>How This Works</h2>
+          <h2>How It Works</h2>
           <ol class="howto">
-            <li>Select a store (map or list)</li>
-            <li>Set project hours & people needed</li>
-            <li>System ranks by brand scope + drive time</li>
-            <li>Primary + fallback candidates shown</li>
-            <li>Confirm to lock assignment</li>
+            <li>Select a store</li>
+            <li>Set hours & people needed</li>
+            <li>Ranks by brand scope + drive time</li>
+            <li>Confirm to lock</li>
           </ol>
-          <p class="note">Drive times use Haversine distance × 40 mph average (demo). Real system would pull availability & scopes from Salesforce and use live traffic routing.</p>
+          <p class="note">Drive times are approximate (distance × 40 mph). Production would use Salesforce availability/scopes + live routing.</p>
         </section>
-
         <section class="panel">
           <h2>Assigned Today</h2>
           <div id="assignedList" class="list small"></div>
         </section>
       </aside>
     </div>
+
+    <div id="merchView" class="view merch-view" style="display:none">
+      <div class="merch-header">
+        <div class="merch-user">
+          <div class="avatar" id="merchAvatar">MK</div>
+          <div>
+            <div class="merch-name" id="merchName">Select a person</div>
+            <div class="merch-meta" id="merchMeta">Choose a merchandiser below</div>
+          </div>
+        </div>
+        <select id="personPicker" class="person-picker">
+          <option value="">— Choose merchandiser —</option>
+        </select>
+      </div>
+
+      <div class="week-bar">
+        <button type="button" class="week-nav" id="weekPrev">‹</button>
+        <div class="week-days" id="weekDays"></div>
+        <button type="button" class="week-nav" id="weekNext">›</button>
+      </div>
+
+      <div class="merch-body">
+        <div class="assignments-card">
+          <div class="assignments-title">
+            <span id="dayTitle">Assignments</span>
+            <span class="count-badge" id="dayCount">0</span>
+          </div>
+          <div id="merchAssignments" class="merch-list">
+            <div class="empty-state">Select a merchandiser to see their schedule</div>
+          </div>
+        </div>
+        <div class="merch-map-wrap">
+          <div id="merchMap"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
